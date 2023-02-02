@@ -3,7 +3,6 @@ layout: post
 title:  "LSTM vs Tolkien"
 date:   2023-02-02 23:20:00 +0100
 categories: NLP
-usemathjax: true
 ---
 This notebook is greatly inspired by [this notebook](https://gbnegrini.com/post/tolkien-character-or-prescription-drug-neural-networks/) by G. Negrini. Please check out his website as he make really good content.
 In orginal notebook he used Keras library while this approach is based on duo Jax + [Haiku](https://dm-haiku.readthedocs.io/en/latest/) from DeepMind. 
