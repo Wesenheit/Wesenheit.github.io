@@ -215,7 +215,7 @@ Y_train=jnp.concatenate((jnp.zeros(tolkien.shape[0]),jnp.ones(drugs.shape[0])))
 X_train=list(map(tokenize,X_train))
 ```
 
-Finally we split train and validation data using sklearn with raio $0.8$.
+Finally we split train and validation data using sklearn with raio $$0.8$$.
 
 
 ```python
@@ -261,7 +261,7 @@ class Model_LSTM(hk.Module):
 ```
 
 Now let's specify model parameters and write down training loop me will use to train our model. We use LSTM with
-dimensionality $8$ and dropout $0.05$.
+dimensionality $$8$$ and dropout $$0.05$$.
 
 
 ```python
