@@ -368,7 +368,7 @@ plt.tight_layout()
 
 
     
-![png](plots/Tolkien/LSTM_with_Haiku_26_0.png)
+![png](/plots/Tolkien/LSTM_with_Haiku_26_0.png)
     
 
 
