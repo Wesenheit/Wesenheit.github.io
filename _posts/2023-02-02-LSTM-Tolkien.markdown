@@ -193,7 +193,7 @@ print(len(tolkien),len(drugs))
     746 674
 
 
-After preprocessing we are left with $$746$$ unique Tolkien names and $$674$$ unique drug names so we have rather balanced dataset. 
+After preprocessing we are left with $746$ unique Tolkien names and $$674$$ unique drug names so we have rather balanced dataset. 
 
 There are few approaches we can use to preprocess data. One can replace each character by coresponding integer number which should be further preprocessed either by one-hot encoding or embbeding into high-dimensional space. Because we have only 26 characters we will follow orginal approach and one-hot encode our values.
 
