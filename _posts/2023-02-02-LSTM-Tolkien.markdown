@@ -3,6 +3,7 @@ layout: post
 title:  "LSTM vs Tolkien"
 date:   2023-02-02 23:20:00 +0100
 categories: NLP
+usemathjax: true
 ---
 This notebook is greatly inspired by [this notebook](https://gbnegrini.com/post/tolkien-character-or-prescription-drug-neural-networks/) by G. Negrini. Please check out his website as he make really good content.
 In orginal notebook he used Keras library while this approach is based on duo Jax + [Haiku](https://dm-haiku.readthedocs.io/en/latest/) from DeepMind. 
@@ -193,7 +194,7 @@ print(len(tolkien),len(drugs))
     746 674
 
 
-After preprocessing we are left with $746$ unique Tolkien names and $674$ unique drug names so we have rather balanced dataset. 
+After preprocessing we are left with $$746$$ unique Tolkien names and $$674$$ unique drug names so we have rather balanced dataset. 
 
 There are few approaches we can use to preprocess data. One can replace each character by coresponding integer number which should be further preprocessed either by one-hot encoding or embbeding into high-dimensional space. Because we have only 26 characters we will follow orginal approach and one-hot encode our values.
 
@@ -372,7 +373,7 @@ plt.tight_layout()
     
 
 
-We can see that after $\sim 20$ epochs we reach maximum accuracy depsite decreasing loss as we probably hit limit of our model but to be honest I think it's really impresing behaviour as net outperforms me by far when it comes to 
+We can see that after $$\sim 20$$ epochs we reach maximum accuracy depsite decreasing loss as we probably hit limit of our model but to be honest I think it's really impresing behaviour as net outperforms me by far when it comes to 
 name recognition. 
 
 Now let's investigate confusion matrix for our validation set followed by classification report.
