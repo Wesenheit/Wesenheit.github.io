@@ -75,13 +75,14 @@ Following orginal approach we use
 \begin{equation}
 q(x,w,z|y)=q_{\phi_w}(w|y)q_{\phi_x}(x|y)p_\beta(z|x,w)
 \end{equation}
-where $$\phi_x$$ and  $$\phi_x$$ denote neural networks used in inference process. In order to obtain posterior on $z$ which is denoted as $$p_\beta(z|x,w)$$
+where $$\phi_x$$ and  $$\phi_x$$ denote neural networks used in inference process (as previously they parametrize means and variations of gaussian posterior).
+In order to obtain posterior on $z$ which is denoted as $$p_\beta(z|x,w)$$
 we can write 
 \begin{equation}
     p_\beta(z_i=1|x,w)=\frac{p(z_i=1)p(x|z_i=1,w)}{\sum_{j=1}^{K}p(z_j=1)p(x|z_j=1,w)}
 \end{equation}
 We can see, that in our variational family we have no explicit inference process with regard to $$z$$! This is quiet important as
-it's much harder to sample from categorical distributions in the way that will allow to propagate gradient. There are few approaches, one of them standing out from other is Gumbel-softmax reparametrization trick introduced in [this paper](https://arxiv.org/abs/1611.01144).
+it's much harder to sample from categorical distributions in the way that will allow to propagate gradient. There are few approaches, one of them is Gumbel-softmax reparametrization trick introduced in [this paper](https://arxiv.org/abs/1611.01144).
 # Loss function
 As usual we write down our objection function which is -ELBO
 \begin{equation}
@@ -93,11 +94,91 @@ As usual we write down our objection function which is -ELBO
 \end{equation}
 
 \begin{equation}
-    E_{q(w|y)p(z|x,y)}+\mathcal{D}_{KL}(q(x|y)||p(x|w,z))+
+    E_{q(w|y)p(z|x,y)}+\mathcal{D}_{KL}(q(x|y)||p(x|w,z))
 \end{equation}
+
 First two terms represent something we had earlier, KL between prior for $$w$$ and posterior and reconstruction loss. Third term represents 
 KL between posterior and prior for $$z$$ but here we have categorical distributions rather then gaussian ones. At the end we have something one can write down as 
 conditional prior term, it represents how our posterior on $$x$$ is different from our GMM model. We can write down this term as 
 \begin{equation}
     \sum_{i=1}^{K}p(z_i=1|x,w)\mathcal{D}_{KL}(q(x|y)||p(x|w,z_i=1))
 \end{equation}
+What is easy to compute as again we have KL between two gaussian distributions.
+When we see how our loss function looks like we can look at our data.
+
+## Gene expression data
+Data used in this study is modified version of data used in this competition. It can be found in [github repository](https://github.com/Wesenheit/SAD2-22W/tree/main/Project1/data). 
+Data consist of expression measurments of $$5000$$ genes. There are $$72208$$ observations in training set and $$18052$$ in test set. Data was collected from
+$$10$$ donors at $$4$$ lab sites for $$45$$ different cell types. Data is heavily zero inflated as $$91\%$$ of data is equal zero. Totally we have
+$$12$$ unique combinations of donors and lab sites which will be important. Our measurments are expressed in counts so it's only discrete, mean value of test set is $$0.44$$ while standard deviation is $$34$$. 
+
+## Implementation of model
+In order to implement GMMVAE PyTorch library was used. Here decided dimensionality of data was $$n_x=200$$, $$n_z=200$$ while number of clusters was set to $$K=20$$. As data we are dealing with discret data we can model our data using Negative Binomial distribution with parameters $$p\in [0,1]$$, $$r\in \mathcal{R}^+$$. Total likelihood can be described by formula: 
+\begin{equation}
+    P(x=k|r_i,p_i)=\left({k+r-1\choose k}(1-p)^k p^r\right)
+\end{equation}
+As there are two parameters to specify we need to have two heads with dimensionality $$5000$$ each in our decder. 
+
+As previously mentioned there are $$12$$ 
+distinct ID of batch, there is great probability that instead of clustering based on purly biological casues we would obtain clustering based on those batches.
+In order to overcom this instead of modeling $$p(y|x)$$ we model $$p(y|x,b)$$ where $$b$$ is one-hot encoded vector of batch ID. This hopefully will help to 
+clear latent space $$x$$ from any external effects alowing to catch only biological activity.
+
+
+Decoder and encoder of our VAE were $$2$$ layers deep with parameters:
+* Encoder: $$5000-300-250$$ followed by 2 heads with dimensionality $$2n_x$$ and $$2n_w$$ used to describe posterior of $$x$$ and $$w$$
+* Decoder: $$n_x+12-250-300$$ followed by 2 heads with dimensionality $$5000$$
+Each layer was followed by gelu activation, layer normalization layer and dropout with $$p=0.05$$. $$\beta$$ neural network was one layer deep with dimensions
+$$n_w-500-4Kn_x$$. As in data we have few observations with high value we need to scale down our data to zero mean and variation of $1$. Here we can implement relevant class to do so.
+
+```python
+import torch
+from torch import nn
+from torch.nn import functional as F
+from typing import List,Optional,Tuple
+
+class norm_layer(nn.Module):
+    """
+    Normalizing layer to preprocess data using known mean and std
+    """
+    def __init__(self,mean,std):
+        super().__init__()
+        self.mean=mean
+        self.std=std
+    def forward(self,x):
+        return (x-self.mean)/self.std
+```
+Now let's write class of our encoder.
+
+```python
+class Encoder(nn.Module):
+    """
+    General class for encoder
+    """
+    def __init__(self,sizes:List,
+                 dimx:int,
+                 dimw:int,
+                 preproces=None,
+                 dropout:Optional[float]=0.05) -> None:
+        """
+        sizes
+        """
+        super().__init__()
+        self.latent_size = sizes[-1]
+        self.network = []
+        if preproces is not None:
+            self.network.append(preproces)
+        for i in range(len(sizes)-1):
+            self.network.append(nn.Linear(sizes[i],sizes[i+1]))
+            self.network.append(nn.LayerNorm(sizes[i+1]))
+            self.network.append(nn.GELU())
+            self.network.append(nn.Dropout(dropout))
+        self.infer_x = nn.Linear(sizes[-1],dimx*2)
+        self.infer_w = nn.Linear(sizes[-1],dimw*2)
+        self.network = nn.Sequential(*self.network)
+
+    def forward(self,inp:torch.Tensor)-> Tuple[Tuple[torch.Tensor]]:
+        inp = self.network(inp)
+        return (torch.chunk(self.infer_w(inp),2,dim=-1),
+                torch.chunk(self.infer_x(inp),2,dim=-1))
+```
