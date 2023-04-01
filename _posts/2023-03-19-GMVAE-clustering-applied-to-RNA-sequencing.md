@@ -7,7 +7,7 @@ header-includes:
    - \usepackage{amsmath,amssymb}
 ---
 ## Introduction
-One of many classical tasks of machine learning is clustering, based on data one would like to distinguish few clusters of data based on it's internal properties.
+One of many classical tasks of machine learning is clustering, based on data one would like to distinguish few clusters based on internal properties od data.
 There are many classical approaches to clustering most notable ones including K-means, GMM (Gaussian Mixture Model) trained via EM algorithm and DBSCAN.
 While each of those algorithms is widely used in the research and industry all of them try to cluster data using it's original representation and mostly fail in the case of hidden similarity between observations.\\
 In this post I present GMM+VAE deep learning architecture that can be used to merge learned latent representation which will be then used to cluster the data using GMM model.
@@ -112,7 +112,7 @@ When we see how our loss function looks like we can look at our data.
 Data used in this study is taken from benchmark set of the competition. Cite data was used with gene expression (GEX) features only.
 Data consist of expression measurements of $$13431$$ genes. There are $$58861$$ observations in training set and $$10388$$ in test set. Data was collected from
 $$10$$ donors at $$4$$ lab sites for $$22$$ different cell types. Data is heavily zero inflated as $$91\%$$ of data is equal zero. Totally we have
-$$13$$ unique combinations of donors and lab sites which will be important. Our measurements are expressed in counts so it's only discrete, mean value of test set is $$0.2$$ while standard deviation is $$22$$. We can see how our data looks like on heatmap below. We can see that almost all of the data is dominated by 
+$$13$$ unique combinations of donors and lab sites which will be important. Our measurements are expressed in counts so it's only discrete, mean value of test set is $$0.14$$ while standard deviation is $$2.38$$. We can see how our data looks like on heatmap below. We can see that almost all of the data is dominated by 
 zero, each measurements above $$0$$ is colored and still we can see almost no colors.
 
 ![png](/plots/GMVAE/heatmap.png)
@@ -169,6 +169,46 @@ is repeated $$6$$ times.
 
 # Results
 In order to determine how cluster number influences performance of clustering grid search over number of clusters $$K$$ was performed. As we expect clustering 
-to work best for $$K=22$$ test was performed for $$K$$ values $$1$$, $$10$$, $$20$$, $$30$$, $$40$$ and $$50$$ as we would like to cover vast 
-range of possible values. Following table shows how measure values depend on the number of clusters:
+to work best for $$K=22$$ calculations were performed for $$K$$ equal $$1$$, $$10$$, $$20$$, $$30$$, $$40$$ and $$50$$, we would like to cover vast 
+range of possible values together with those much higher then $$22$$. Following table shows how measure values depend on the number of clusters:
 
+| K      | ARI                | ASW                | NMI                | Batch ASW          | kBET               | $$-ELBO$$ |
+|--------|--------------------|--------------------|--------------------|--------------------|--------------------|-----------|
+| $$1$$  | $$0.359\pm 0.028$$ | $$0.724\pm 0.005$$ | $$0.666\pm 0.014$$ | $$0.793\pm 0.004$$ | $$0.802\pm 0.013$$ | $$3582$$  |
+| $$10$$ | $$0.415\pm 0.032$$ | $$0.680\pm 0.015$$ | $$0.728\pm 0.017$$ | $$0.828\pm 0.004$$ | $$0.807\pm 0.030$$ | $$3578$$  |
+| $$20$$ | $$0.394\pm 0.029$$ | $$0.679\pm 0.014$$ | $$0.716\pm 0.010$$ | $$0.822\pm 0.007$$ | $$0.809\pm 0.030$$ | $$3578$$  |
+| $$30$$ | $$0.402\pm 0.037$$ | $$0.705\pm 0.011$$ | $$0.716\pm 0.009$$ | $$0.824\pm 0.003$$ | $$0.799\pm 0.022$$ | $$3579$$  |
+| $$40$$ | $$0.395\pm 0.021$$ | $$0.683\pm 0.014$$ | $$0.724\pm 0.007$$ | $$0.825\pm 0.005$$ | $$0.825\pm 0.019$$ | $$3580$$  |
+| $$50$$ | $$0.383\pm 0.040$$ | $$0.707\pm 0.017$$ | $$0.710\pm 0.007$$ | $$0.820\pm 0.007$$ | $$0.795\pm 0.008$$ | $$3581$$  |
+
+It's clearly visible that model benefits from configurations with many clusters, using $$K>1$$ we can achieve much better results. Surprisingly
+best model does not use $$K=20$$ as one can expect as this is closest value to actual number of cells although differences between models are quite small
+and not statistically significant. On the other hand $$-ELBO$$ is much more stable and indicates that best values are achieved for $$K<30$$. There is 
+also one thing that should be noticed. Even if total loss is rather stable and does not change across repetitions $$z$$ prior loss is changing.
+Moreover it's slightly correlated with aforementioned measures of clustering.  
+
+# Over-regularisation? 
+Sometimes VAE exhibit behaviour called overregularistion when prior term is so strong that it overpowers reconstruction loss an results in pure feature 
+representation. 
+This affects GMVAE as well and manifest itself in the form of huge degenerate clusters as shown in original paper. One of the solutions to the problem is to switch on regularization over $$z$$
+latent variable only when $$z$$ prior loss is bigger then some constant $$\lambda$$. Strictly speaking
+\begin{equation}
+    \mathcal{L}=max(\lambda,\mathcal{D}_{KL}(p(z|x,w) || p(z) ))
+\end{equation}
+Idea is simple, we start with no effective loss for $$z$$ prior and try to spiral down into more optimal solution and then turn loss above some value.
+Unfortunately this study failed to capture if using nonzero $$\lambda$$ is able to help with clustering. In order to see whether results would be better
+one need to gather more data to train.
+
+# Sample Results
+At the end UMAP embedding on one particular setting is presented together with loss curve. $$K=22$$ was selected as it's equal to cell number in dataset.
+![png](/plots/GMVAE/loss_curve_80_60_22_0.png){: width="1500" }
+At the end of the training our model is slightly overfitted which isn't surprising as we heave really high dimensional input. Nevertheless
+training error does not increase during training.
+![png](/plots/GMVAE/umap_latent_80_60_22_0.png){: width="1500" }
+We can see that embedding it's much better in resolving particular cell types then UMAP on pure data.
+
+## Conclusions
+
+In presented work performance of GMVAE was analysed with regard to unsupervised clustering task. Negative binomial distribution 
+was used to model gene expression data resulting in quite good embedding of biological signal together with suppression of batch effect. Whole model with
+associated code can be found in [github repository](https://github.com/Wesenheit/GEX_GMVAE).
