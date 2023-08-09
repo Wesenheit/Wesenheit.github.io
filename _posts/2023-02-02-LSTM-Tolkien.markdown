@@ -4,10 +4,10 @@ title:  "LSTM vs Tolkien"
 date:   2023-02-02 23:20:00 +0100
 categories: NLP
 ---
-This notebook is greatly inspired by [this notebook](https://gbnegrini.com/post/tolkien-character-or-prescription-drug-neural-networks/) by G. Negrini. Please check out his website as he make really good content.
-In orginal notebook he used Keras library while this approach is based on duo Jax + [Haiku](https://dm-haiku.readthedocs.io/en/latest/) from DeepMind. 
+This notebook is greatly inspired by [this notebook](https://gbnegrini.com/post/tolkien-character-or-prescription-drug-neural-networks/) by G. Negrini. Please check out his website as he makes really good content.
+In the orginal notebook, he used the Keras library while this approach is based on duo Jax + [Haiku](https://dm-haiku.readthedocs.io/en/latest/) from DeepMind. 
 Here we will try to recognize between drug names and Tolkien characters 
-using simple LSTM model which surprisingly isn't as easy as one can think. If you want to challange yourself here is popular website with [great quiz](https://antidepressantsortolkien.vercel.app/).
+using a simple LSTM model which surprisingly isn't as easy as one can think. If you want to challenge yourself here is a popular website with [a great quiz](https://antidepressantsortolkien.vercel.app/).
 
 
 ```python
@@ -28,7 +28,7 @@ np.random.seed(42)
 ```
 
 # Data
-Fortunately following original notebook we can find great database with tolkien names on www.behindthename.com. 
+Fortunately following the original notebook we can find a great database with tolkien names on www.behindthename.com. 
 
 
 ```python
@@ -144,7 +144,7 @@ raw_tolkien_chars[2].iloc[200:210,:]
 
 
 
-We can see not only names contain non-ASCII characters so we need to preprocess our data. We will lower all characters and replace every character to ASCII base.
+We can see not only names contain non-ASCII characters so we need to preprocess our data. We will lower all characters and replace every character to an ASCII base.
 
 
 ```python
@@ -259,7 +259,7 @@ class Model_LSTM(hk.Module):
 
 ```
 
-Now let's specify model parameters and write down training loop me will use to train our model. We use LSTM with
+Now let's specify model parameters and write down the training loop we will use to train our model. We use LSTM with
 dimensionality $$8$$ and dropout $$0.05$$.
 
 
@@ -372,10 +372,10 @@ plt.tight_layout()
     
 
 
-We can see that after $$\sim 20$$ epochs we reach maximum accuracy depsite decreasing loss as we probably hit limit of our model but to be honest I think it's really impresing behaviour as net outperforms me by far when it comes to 
+We can see that after $$\sim 20$$ epochs, we reach maximum accuracy despite decreasing loss as we probably hit the limit of our model but to be honest I think it's really impressing behaviour as net outperforms me by far when it comes to 
 name recognition. 
 
-Now let's investigate confusion matrix for our validation set followed by classification report.
+Now let's investigate the confusion matrix for our validation set followed by the classification report.
 
 
 ```python
@@ -421,4 +421,4 @@ print(classification_report(Y_val, predictions, target_names=['Drug', 'Tolkien']
     
 
 
-We see thet drugs prediction have slightly better precition while Tolkien names have better recall.
+We see that drug prediction has slightly better precision while Tolkien names have better recall.
