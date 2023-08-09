@@ -4,10 +4,17 @@ title:  "LSTM vs Tolkien"
 date:   2023-02-02 23:20:00 +0100
 categories: NLP
 ---
+<<<<<<< HEAD
 This notebook is greatly inspired by [this notebook](https://gbnegrini.com/post/tolkien-character-or-prescription-drug-neural-networks/) by G. Negrini. Please check out his website as he makes really good content.
 In the orginal notebook, he used the Keras library while this approach is based on duo Jax + [Haiku](https://dm-haiku.readthedocs.io/en/latest/) from DeepMind. 
 Here we will try to recognize between drug names and Tolkien characters 
 using a simple LSTM model which surprisingly isn't as easy as one can think. If you want to challenge yourself here is a popular website with [a great quiz](https://antidepressantsortolkien.vercel.app/).
+=======
+This notebook is greatly inspired by [this notebook](https://gbnegrini.com/post/tolkien-character-or-prescription-drug-neural-networks/) by G. Negrini. Please check out his website as he make really good content.
+In original notebook he used Keras library while this approach is based on duo Jax + [Haiku](https://dm-haiku.readthedocs.io/en/latest/) from DeepMind. 
+Here we will try to recognize between drug names and Tolkien characters 
+using simple LSTM model which surprisingly isn't as easy as one can think. If you want to challenge yourself here is popular website with [great quiz](https://antidepressantsortolkien.vercel.app/).
+>>>>>>> 93b45c0d86afd75ba404fcba7c1e72635d199e1c
 
 
 ```python
@@ -154,7 +161,7 @@ tolkien=np.array(list(map(lambda x:x
                           .lower(),raw_tolkien_chars[2]["Name"].values)))
 ```
 
-Following orginal notebook we will use [medication guide](https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=medguide.page) from US Food & Drug Administration and use simmilar preprocessing as before.
+Following original notebook we will use [medication guide](https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=medguide.page) from US Food & Drug Administration and use similar preprocessing as before.
 
 
 ```python
@@ -195,7 +202,7 @@ print(len(tolkien),len(drugs))
 
 After preprocessing we are left with $$746$$ unique Tolkien names and $$674$$ unique drug names so we have rather balanced dataset. 
 
-There are few approaches we can use to preprocess data. One can replace each character by coresponding integer number which should be further preprocessed either by one-hot encoding or embbeding into high-dimensional space. Because we have only 26 characters we will follow orginal approach and one-hot encode our values.
+There are few approaches we can use to preprocess data. One can replace each character by corresponding integer number which should be further preprocessed either by one-hot encoding or embedding into high-dimensional space. Because we have only 26 characters we will follow original approach and one-hot encode our values.
 
 
 ```python
@@ -214,7 +221,7 @@ Y_train=jnp.concatenate((jnp.zeros(tolkien.shape[0]),jnp.ones(drugs.shape[0])))
 X_train=list(map(tokenize,X_train))
 ```
 
-Finally we split train and validation data using sklearn with raio $$0.8$$.
+Finally we split train and validation data using sklearn with ratio $$0.8$$.
 
 
 ```python
@@ -225,12 +232,12 @@ X_train,X_val,Y_train,Y_val=train_test_split(X_train,Y_train,train_size=0.8)
 
 Now we implement simple LSTM model with Haiku. We have one layer of LSTM with dimension we specify followed by one 
 dense layer with dropout. Instead of simple classification head or multiclassification task we will use
-two binary classification heads for each class. We will also model logits during training as we will use the fact that binary cross-entropy have simple when modeling logits instead of propabilities. Instead of using hk.dynamic_unroll as typically we will use hk.scan which is thin wrapper around jax.lax.scan with additional parameter unroll
+two binary classification heads for each class. We will also model logits during training as we will use the fact that binary cross-entropy have simple when modeling logits instead of probabilities. Instead of using hk.dynamic_unroll as typically we will use hk.scan which is thin wrapper around jax.lax.scan with additional parameter unroll
 allowing to choose option in between static unroll and full dynamic unroll. Between layers we use GeLU activation instead of ReLU.
 
 
 ```python
-def reverse(t): #we need to reverse our sequence as scan needs function with signarure F(carry,x)
+def reverse(t): #we need to reverse our sequence as scan needs function with signature F(carry,x)
     return t[1],t[0]
 
 class Model_LSTM(hk.Module):
@@ -372,7 +379,11 @@ plt.tight_layout()
     
 
 
+<<<<<<< HEAD
 We can see that after $$\sim 20$$ epochs, we reach maximum accuracy despite decreasing loss as we probably hit the limit of our model but to be honest I think it's really impressing behaviour as net outperforms me by far when it comes to 
+=======
+We can see that after $$\sim 20$$ epochs we reach maximum accuracy despite decreasing loss as we probably hit limit of our model but to be honest I think it's really impressing behaviour as net outperforms me by far when it comes to 
+>>>>>>> 93b45c0d86afd75ba404fcba7c1e72635d199e1c
 name recognition. 
 
 Now let's investigate the confusion matrix for our validation set followed by the classification report.
@@ -421,4 +432,8 @@ print(classification_report(Y_val, predictions, target_names=['Drug', 'Tolkien']
     
 
 
+<<<<<<< HEAD
 We see that drug prediction has slightly better precision while Tolkien names have better recall.
+=======
+We see that drugs prediction have slightly better precision while Tolkien names have better recall.
+>>>>>>> 93b45c0d86afd75ba404fcba7c1e72635d199e1c
