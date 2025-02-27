@@ -19,4 +19,4 @@ On this page you can find my research publications. During my career I was activ
 1. **M. Kapusta** et al. "3D geometry and magnetic connections of erupting black hole jet" contributed talk at the Les Houches conference "Feeling the pull and the pulse of relativistic magnetospheres" (April 2025, Les Houches)
 2. **M. Kapusta** et al. "Extreme resolution GRMHD simulations of Astrophysical jets", presentation at 10th Symposium for Young Researchers,
 presentation awarded with distinctions (September 2024, Warsaw)
-3. K. Nalewajko, **M. Kapusta**, A. Janiuk "Chaotic Magnetic Disconnections Trigger Flux Eruptions in Accretion Flows Channeled onto Magnetically Saturated Kerr Black Holes" A&A 692, A37 (2024) [[arXiv]](https://arxiv.org/abs/22410.08280)
+3. K. Nalewajko, **M. Kapusta**, A. Janiuk "Chaotic Magnetic Disconnections Trigger Flux Eruptions in Accretion Flows Channeled onto Magnetically Saturated Kerr Black Holes" A&A 692, A37 (2024) [[arXiv]](https://arxiv.org/abs/2410.08280)
