@@ -11,7 +11,7 @@ One cross † denotes the poster, while double cross denotes an oral presentatio
 1. † **Mateusz Kapusta** "Iris-ML: Neural Posterior Estimation for the Spectral Energy Distribution fitting." poster at ML in PL 2024 machine learning conference (November 2024, Warsaw).
 
 # Observational Astrophysics
-1. **M. Kapusta** et al. "Archival Hubble Space Telescope observations reveal a 25-year-old glimpse on the free-floating planet candidate OGLE-2023-BLG-0524", soon to be submitted to A&A
+1. **M. Kapusta** et al. "HST pre-imaging of the free-floating planet candidate microlensing event", soon to be submitted to A&A
 2. P. Mróz, A. Udalski, M. Szymański, **M. Kapusta**, et al. "Microlensing Optical Depth and Event Rate toward the Large Magellanic Cloud Based on 20 yr of OGLE Observations"
       ApJS, 273, 4 (2024) [[arXiv]](https://arxiv.org/abs/2403.02398)
 3.  **M. Kapusta**, P. Mróz. "The search for Dormant Black Holes in the OGLE data" Acta Astron., 73, 197 (2023) [[arXiv]](https://arxiv.org/abs/2401.11293)
