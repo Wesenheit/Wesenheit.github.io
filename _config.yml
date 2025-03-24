@@ -17,6 +17,7 @@ markdown: kramdown
 header_pages:
   - index.markdown
   - about.markdown
+  - posters.markdown
   - publications.markdown # Add your new page here
 
 sass:
