@@ -160,7 +160,7 @@ epochs.
 For every batch, a gradient is estimated using $$M=10$$ Monte Carlo samples allowing for much more stable training. The following architecture was found to be the best 
 after a few tries, as it's the biggest model that's only slightly overfitting. 
 
-# Measuring performance of embedding
+# Measuring performance of the embedding
 There are many ways to measure whether the embedding works well. To keep things simple, five particular measures will be used.
 Most scores are based on [original score methods](https://openproblems.bio/competitions/neurips_2021_docs/about_tasks/task3_joint_embedding.html).
 Three of them measure the effect of clustering, while the remaining two measure the impact of the batch effect on clustering:
